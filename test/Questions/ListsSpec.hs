@@ -26,6 +26,22 @@ spec = do
     it "throws an exception if used with an empty list" $ do
           evaluate (myLast'' []) `shouldThrow` anyException
 
+  
+  describe "at" $ do
+    it "should return at given index in list" $ 
+      element_at [1,2,3,4,5] 3 `shouldBe` (3::Int)
+
+  describe "at'" $ do
+    it "should return at given index in list" $ 
+      element_at' [1,2,3,4,5] 4 `shouldBe` (4::Int)
+
+  describe "at''" $ do
+    it "should return at given index in list" $ 
+      element_at'' [1,2,3,4,5] 4 `shouldBe` (4::Int)
+
+  describe "at'''" $ do
+    it "should return at given index in list" $ 
+      element_at''' [1,2,3,4,5] 4 `shouldBe` (4::Int)
 
 main :: IO ()
 main = hspec spec

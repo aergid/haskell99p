@@ -17,10 +17,10 @@ myLast (_:xs) = myLast xs
 myLast [] = error "Empty list has no last element"
 
 myLast' ::  [a] -> a
-myLast' = foldr1 (\x acc -> acc)
+myLast' = foldr1 (\_ acc -> acc)
 
 myLast'' ::  [a] -> a
-myLast'' = foldl1 (\acc x -> x)
+myLast'' = foldl1 (\_ x -> x)
 
 myLast''' ::  [a] -> a
 myLast''' = foldl1 (const id)
@@ -56,9 +56,9 @@ myLast''' = foldl1 (const id)
 
 myButLast ::  [t] -> t
 myButLast ([]) = error "List too short"
-myButLast (x:[]) = error "List too short"
-myButLast (x:y:[]) = x
-myButLast (x:y:zs) = myButLast $ y:zs
+myButLast (_:[]) = error "List too short"
+myButLast (x:_:[]) = x
+myButLast (_:y:zs) = myButLast $ y:zs
 
 myButLast' ::  [c] -> c
 myButLast' = head . tail . reverse
@@ -86,3 +86,105 @@ myButLast'' = last . init
  --    where e1 = error "List too small!"
  --          e2 = error "List is null!"
  -}
+
+{-
+ --Problem 3
+ --
+ --(*) Find the K'th element of a list. The first element in the list is number 1.
+ --
+ --Example:
+ --
+ --* (element-at '(a b c d e) 3)
+ --c
+ --
+ --Example in Haskell:
+ --
+ --Prelude> elementAt [1,2,3] 2
+ --2
+ --Prelude> elementAt "haskell" 5
+ --'e'
+ -}
+
+element_at ::  (Ord a, Num a, Enum a) => [t] -> a -> t
+element_at [] _ = error "list is empty!"
+element_at (x:_) 1 = x
+element_at (_:xs) n | n > 0 = element_at xs $ pred n
+                | n < 0 = error "negative index!"
+
+element_at' ::  [c] -> Int -> c
+element_at' xs n = head . drop (n - 1) $ xs
+
+element_at'' ::  [c] -> Int -> c
+element_at'' xs n = last . take n $ xs
+
+element_at''' ::  (Num b, Eq b, Eq c, Enum b) => [c] -> b -> c
+element_at''' xs n = fst . head. filter (\cs -> snd cs == n ) $ zip xs [1..]
+
+
+{-
+ --This is (almost) the infix operator !! in Prelude, which is defined as:
+ --
+ --(!!)                :: [a] -> Int -> a
+ --(x:_)  !! 0         =  x
+ --(_:xs) !! n         =  xs !! (n-1)
+ --
+ --Except this doesn't quite work, because !! is zero-indexed, and element-at should be one-indexed. So:
+ --
+ --elementAt :: [a] -> Int -> a
+ --elementAt list i    = list !! (i-1)
+ --
+ --Or without using the infix operator:
+ --
+ --elementAt' :: [a] -> Int -> a
+ --elementAt' (x:_) 1  = x
+ --elementAt' [] _     = error "Index out of bounds"
+ --elementAt' (_:xs) k
+ --  | k < 1           = error "Index out of bounds"
+ --  | otherwise       = elementAt' xs (k - 1)
+ --
+ --Alternative version:
+ --
+ --elementAt'' :: [a] -> Int -> a
+ --elementAt'' (x:_) 1  = x
+ --elementAt'' (_:xs) i = elementAt'' xs (i - 1)
+ --elementAt'' _ _      = error "Index out of bounds"
+ --
+ --This does not work correctly on invalid indexes and infinite lists, e.g.:
+ --
+ --elementAt'' [1..] 0
+ --
+ --A few more solutions using prelude functions:
+ --
+ --elementAt'' xs n | length xs < n = error "Index out of bounds"
+ --           | otherwise = fst . last $ zip xs [1..n]
+ --
+ --elementAt''' xs n = head $ foldr ($) xs 
+ --                         $ replicate (n - 1) tail
+ ---- Negative indeces not handled correctly:
+ ---- Main> elementAt''' "haskell" (-1)
+ ---- 'h'
+ --
+ --elementAt_w' xs n = last . take n $ xs -- wrong
+ ---- Main> map (elementAt_w' [1..4]) [1..10]
+ ---- [1,2,3,4,4,4,4,4,4,4]
+ --
+ --elementAt_w'' xs n = head . reverse . take n $ xs -- wrong
+ ---- Main> map (elementAt_w'' [1..4]) [1..10]
+ ---- [1,2,3,4,4,4,4,4,4,4]
+ --
+ --elementAt_w''' xs n = head . drop (n - 1) $ xs -- wrong
+ ---- Main> map (elementAt_w''' [1..4]) [0..10]
+ ---- [1,1,2,3,4,*** Exception: Prelude.head: empty list
+ --
+ --or
+ --elementAt_w'
+ --correctly in point-free style:
+ --
+ --elementAt_w'pf = (last .) . take . (+ 1)
+ --
+ --Pedantic note: the above definition of
+ --elementAt_w'pf
+ --does not conform to the order of arguments specified by the question, but the following does:
+ --
+ --elementAt_w'pf' = flip $ (last .) . take . (+ 1)
+ --}
