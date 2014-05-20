@@ -5,12 +5,15 @@ import           Questions.Lists
 import           Test.Hspec
 import           Test.QuickCheck
 
+
+spec = foldr1 (>>) specList
+
 specList :: [Spec]
 specList = do
     myLastImpl <- [myLast, myLast', myLast'']
     return $ describe "last" $ do
         it "should return last element in a list" $
-             myLastImpl [1,2,3] `shouldBe` (3::Int)
+             myLastImpl [1,2,4] `shouldBe` (3::Int)
 
     {-it "should throw an error on empty list" $-}
      {-evaluate(myLast []) `shouldThrow` errorCall "Empty list has no last element"-}
@@ -43,8 +46,7 @@ specList = do
     {-it "should return at given index in list" $ -}
       {-element_at''' [1,2,3,4,5] 4 `shouldBe` (4::Integer)-}
 
-{-main :: IO ()-}
-{-main = hspec spec-}
-{-main = undefined-}
 
-main = foldr (>>) (return ()) $ map hspec specList
+main :: IO ()
+{-main = foldr (>>) (return ()) $ map hspec specList-}
+main = hspec $ foldr1 (>>) specList
