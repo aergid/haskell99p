@@ -5,48 +5,46 @@ import           Questions.Lists
 import           Test.Hspec
 import           Test.QuickCheck
 
+specs :: [Spec]
+specs = specLast ++ specButLast
 
-spec = foldr1 (>>) specList
+spec :: Spec
+spec = foldr1 (>>) $ specs
 
-specList :: [Spec]
-specList = do
+specLast :: [Spec]
+specLast = do
     myLastImpl <- [myLast, myLast', myLast'']
     return $ describe "last" $ do
-        it "should return last element in a list" $
-             myLastImpl [1,2,4] `shouldBe` (3::Int)
+        it "returns the last element of an *nonempty* list" $
+              property $ \x xs -> myLastImpl (x:xs) == (last (x:xs) :: Int)
 
-    {-it "should throw an error on empty list" $-}
-     {-evaluate(myLast []) `shouldThrow` errorCall "Empty list has no last element"-}
+        it "throws an exception if used with an empty list" $ do
+              evaluate (myLast'' []) `shouldThrow` anyException
 
+        {-it "should throw an error on empty list" $-}
+         {-evaluate(myLast []) `shouldThrow` errorCall "Empty list has no last element"-}
 
-  {-describe "last'" $ do-}
-    {-it "should return last element in a list" $-}
-      {-myLast [1,2,3,4] `shouldBe` (4::Int)-}
+specButLast :: [Spec]
+specButLast = do
+    butLast <- [myButLast, myButLast', myButLast'']
+    return $ describe "butLast" $ do
+        it "returns last but one element from list" $
+            butLast [1,2,3,4,5] `shouldBe` (4::Int)
 
-  {-describe "last''" $ do-}
-    {-it "returns the last element of an *nonempty* list" $-}
-          {-property $ \x xs -> myLast'' (x:xs) == (last (x:xs) :: Int)-}
+        it "shold fail on empty list" $ do
+            evaluate(myButLast []) `shouldThrow` anyException
 
-    {-it "throws an exception if used with an empty list" $ do-}
-          {-evaluate (myLast'' []) `shouldThrow` anyException-}
+        it "shold fail on list with 1 element" $ do
+            evaluate(myButLast [1::Int]) `shouldThrow` anyException
 
-  {-describe "at" $ do-}
-    {-it "should return at given index in list" $ -}
-      {-element_at [1,2,3,4,5] 3 `shouldBe` (3::Int)-}
-
-  {-describe "at'" $ do-}
-    {-it "should return at given index in list" $ -}
-      {-element_at' [1,2,3,4,5] 4 `shouldBe` (4::Int)-}
-
-  {-describe "at''" $ do-}
-    {-it "should return at given index in list" $ -}
-      {-element_at'' [1,2,3,4,5] 4 `shouldBe` (4::Int)-}
-
-  {-describe "at'''" $ do-}
-    {-it "should return at given index in list" $ -}
-      {-element_at''' [1,2,3,4,5] 4 `shouldBe` (4::Integer)-}
+specAt :: [Spec]
+specAt = do
+    myAt <- [element_at, element_at', element_at'', element_at''']
+    return $ describe "at" $ do
+        it "should return at given index in list" $ 
+          element_at [1,2,3,4,5] 3 `shouldBe` (3::Int)
 
 
 main :: IO ()
-{-main = foldr (>>) (return ()) $ map hspec specList-}
-main = hspec $ foldr1 (>>) specList
+{-main = foldr (>>) (return ()) $ map hspec specLast-}
+main = hspec spec

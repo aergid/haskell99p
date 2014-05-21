@@ -117,7 +117,7 @@ element_at' xs n = head . drop (n - 1) $ xs
 element_at'' ::  [c] -> Int -> c
 element_at'' xs n = last . take n $ xs
 
-element_at''' ::  (Num b, Eq b, Eq c, Enum b) => [c] -> b -> c
+element_at''' ::  (Num a, Eq a, Enum a) => [c] -> a -> c
 element_at''' xs n = fst . head. filter (\cs -> snd cs == n ) $ zip xs [1..]
 
 
