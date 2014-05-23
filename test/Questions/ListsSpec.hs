@@ -6,7 +6,7 @@ import           Test.Hspec
 import           Test.QuickCheck
 
 specs :: [Spec]
-specs = specLast ++ specButLast
+specs = specLast ++ specButLast ++ specAt
 
 spec :: Spec
 spec = foldr1 (>>) $ specs
@@ -42,7 +42,7 @@ specAt = do
     myAt <- [element_at, element_at', element_at'', element_at''']
     return $ describe "at" $ do
         it "should return at given index in list" $ 
-          element_at [1,2,3,4,5] 3 `shouldBe` (3::Int)
+          myAt [1,2,3,4,5] 3 `shouldBe` (3::Int)
 
 
 main :: IO ()
