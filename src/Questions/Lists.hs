@@ -187,4 +187,42 @@ element_at''' xs n = fst . head. filter (\cs -> snd cs == n ) $ zip xs [1..]
  --does not conform to the order of arguments specified by the question, but the following does:
  --
  --elementAt_w'pf' = flip $ (last .) . take . (+ 1)
- --}
+ -}
+{-
+ --Problem 4
+ --
+ --(*) Find the number of elements of a list.
+ --
+ --Example in Haskell:
+ --
+ --Prelude> myLength [123, 456, 789]
+ --3
+ --Prelude> myLength "Hello, world!"
+ --13
+ -}
+
+myLength :: [a] -> Int
+myLength = fst . last . zip [1..]
+
+myLength' :: [a] -> Int
+myLength' = foldl (\acc _ -> succ acc) 0
+
+myLength'' :: [a] -> Int
+myLength'' [] = 0
+myLength'' (_:xs) = 1 + myLength xs
+
+myLength''' :: [a] -> Int
+myLength''' = linLength 0
+        where linLength acc [] = acc
+              linLength acc (_:xs) = linLength (succ acc) xs
+
+{-
+ -We can also change each element into our list into a "1" and then add them all together.
+ -
+ -myLength :: [a] -> Int
+ -myLength = sum . map (\_->1)
+ -myLength3 =  foldr (\_ -> (+1)) 0
+ -myLength4 =  foldr ((+) . (const 1)) 0
+ -myLength5 =  foldr (const (+1)) 0
+ -myLength6 =  foldl (const . (+1)) 0V
+ -}

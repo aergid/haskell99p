@@ -6,7 +6,7 @@ import           Test.Hspec
 import           Test.QuickCheck
 
 specs :: [Spec]
-specs = specLast ++ specButLast ++ specAt
+specs = specLast ++ specButLast ++ specAt ++ specLength
 
 spec :: Spec
 spec = foldr1 (>>) $ specs
@@ -41,9 +41,15 @@ specAt :: [Spec]
 specAt = do
     myAt <- [element_at, element_at', element_at'', element_at''']
     return $ describe "at" $ do
-        it "should return at given index in list" $ 
+        it "should return at given index in list" $
           myAt [1,2,3,4,5] 3 `shouldBe` (3::Int)
 
+specLength :: [Spec]
+specLength = do
+    myLen <- [myLength, myLength', myLength'', myLength''']
+    return $ describe "length" $ do
+        it "Hello world example is 13 chars length" $
+            myLen "Hello, world!" `shouldBe` (13::Int)
 
 main :: IO ()
 {-main = foldr (>>) (return ()) $ map hspec specLast-}
