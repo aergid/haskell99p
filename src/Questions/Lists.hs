@@ -105,20 +105,21 @@ myButLast'' = last . init
  --'e'
  -}
 
-element_at ::  (Ord a, Num a, Enum a) => [t] -> a -> t
-element_at [] _ = error "list is empty!"
-element_at (x:_) 1 = x
-element_at (_:xs) n | n > 0 = element_at xs $ pred n
-                | n < 0 = error "negative index!"
+elementAt ::  (Ord a, Num a, Enum a) => [t] -> a -> t
+elementAt [] _ = error "list is empty!"
+elementAt (x:_) 1 = x
+elementAt (_:xs) n | n > 0 = elementAt xs $ pred n
+                    | n < 0 = error "negative index!"
+elementAt _ _ = error "list is empty!"
 
-element_at' ::  [c] -> Int -> c
-element_at' xs n = head . drop (n - 1) $ xs
+elementAt' ::  [c] -> Int -> c
+elementAt' xs n = head . drop (n - 1) $ xs
 
-element_at'' ::  [c] -> Int -> c
-element_at'' xs n = last . take n $ xs
+elementAt'' ::  [c] -> Int -> c
+elementAt'' xs n = last . take n $ xs
 
-element_at''' ::  (Num a, Eq a, Enum a) => [c] -> a -> c
-element_at''' xs n = fst . head. filter (\cs -> snd cs == n ) $ zip xs [1..]
+elementAt''' ::  (Num a, Eq a, Enum a) => [c] -> a -> c
+elementAt''' xs n = fst . head. filter (\cs -> snd cs == n ) $ zip xs [1..]
 
 
 {-
@@ -225,4 +226,74 @@ myLength''' = linLength 0
  -myLength4 =  foldr ((+) . (const 1)) 0
  -myLength5 =  foldr (const (+1)) 0
  -myLength6 =  foldl (const . (+1)) 0V
- -}
+-}
+
+{-
+ -Problem 5
+ -
+ -(*) Reverse a list.
+ -
+ -Example in Haskell:
+ -
+ -Prelude> myReverse "A man, a plan, a canal, panama!"
+ -"!amanap ,lanac a ,nalp a ,nam A"
+ -Prelude> myReverse [1,2,3,4]
+ -[4,3,2,1]
+-}
+
+myReverse :: [a] -> [a]
+myReverse = foldl (flip (:)) []
+
+
+{-
+ -Problem 6
+ -
+ -(*) Find out whether a list is a palindrome. A palindrome can be read forward or backward; e.g. (x a m a x).
+ -
+ -Example in Haskell:
+ -
+ -*Main> isPalindrome [1,2,3]
+ -False
+ -*Main> isPalindrome "madamimadam"
+ -True
+ -*Main> isPalindrome [1,2,4,8,16,8,4,2,1]
+ -True
+-}
+
+isPalindrome :: (Eq a) => [a] -> Bool
+isPalindrome xs = reverse xs == xs
+
+{-
+ -With monomorphism restriction:
+ -isPalindrome1 xs = (uncurry (==) . (id &&& reverse)) xs
+ -
+ -Point free with no monomorphism restriction:
+ -isPalindrome1 = (uncurry (==) . (id &&& reverse))
+ -
+ -isPalindrome''' :: (Eq a) => [a] -> Bool
+ -isPalindrome''' = Control.Monad.liftM2 (==) id reverse
+ -Or even:
+ -isPalindrome'''' :: (Eq a) => [a] -> Bool
+ -isPalindrome'''' = (==) Control.Applicative.<*> reverse
+-}
+{-
+ -
+ - 7 Problem 7
+ -
+ -(**) Flatten a nested list structure
+ - data NestedList a = Elem a | List [NestedList a]
+ -
+ -*Main> flatten (Elem 5)
+ -[5]
+ -*Main> flatten (List [Elem 1, List [Elem 2, List [Elem 3, Elem 4], Elem 5]])
+ -[1,2,3,4,5]
+ -*Main> flatten (List [])
+ -[]
+-}
+
+data NestedList a = Elem a | List [NestedList a]
+
+flatten :: NestedList a -> [a]
+flatten (List []) = []
+flatten (Elem a) = [a]
+flatten (List (x:xs)) = foldl (\acc a -> acc ++ flatten a) (flatten x) xs
