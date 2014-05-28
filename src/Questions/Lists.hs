@@ -1,5 +1,9 @@
 module Questions.Lists where
 
+import           Control.Applicative
+import           Data.Char           (ord, chr)
+import           Data.List           (group)
+
 {-
 --    Problem 1
 --    (*) Find the last element of a list.
@@ -159,7 +163,7 @@ elementAt''' xs n = fst . head. filter (\cs -> snd cs == n ) $ zip xs [1..]
  --elementAt'' xs n | length xs < n = error "Index out of bounds"
  --           | otherwise = fst . last $ zip xs [1..n]
  --
- --elementAt''' xs n = head $ foldr ($) xs 
+ --elementAt''' xs n = head $ foldr ($) xs
  --                         $ replicate (n - 1) tail
  ---- Negative indeces not handled correctly:
  ---- Main> elementAt''' "haskell" (-1)
@@ -297,3 +301,109 @@ flatten :: NestedList a -> [a]
 flatten (List []) = []
 flatten (Elem a) = [a]
 flatten (List (x:xs)) = foldl (\acc a -> acc ++ flatten a) (flatten x) xs
+
+flatten' :: NestedList a -> [a]
+flatten' (Elem a) = [a]
+flatten' (List xs) = concatMap flatten' xs
+
+{- Problem 8
+ -(compress '(a a a a b c c a a d e e e e))
+ -(A B C A D E)
+-}
+
+myCompress :: (Eq a) => [a] -> [a]
+myCompress = map head . group
+
+myCompress' :: Eq a => [a] -> [a]
+myCompress' [] = []
+myCompress' (x:xs) = let (_, others) = span (== x) xs in
+                        x: myCompress' others
+    {- :P
+     -compress []     = []
+     -compress (x:xs) = x : (compress $ dropWhile (== x) xs)
+     -}
+
+{- Problem 9
+ -
+ - *Main> pack ['a', 'a', 'a', 'a', 'b', 'c', 'c', 'a',
+ 'a', 'd', 'e', 'e', 'e', 'e']
+ ["aaaa","b","cc","aa","d","eeee"]
+-}
+
+pack :: Eq a => [a] -> [[a]]
+pack [] = []
+pack xs@(x:_) = let (same, others) = span (== x) xs
+                    in same : pack others
+
+
+{-Problem 10
+ -encode "aaaabccaadeeee"
+ -[(4,'a'),(1,'b'),(2,'c'),(2,'a'),(1,'d'),(4,'e')]
+-}
+
+myEncode :: String -> [(Int, Char)]
+myEncode xs = let mix = [length, ord . head] <*> pack xs
+                  mid = length mix `div` 2
+                  (lengths, leaders) = splitAt mid mix
+                in zip lengths $ map chr leaders
+
+myEncode' :: String -> [(Int, Char)]
+myEncode' xs = let partitioned = pack xs
+                   lengths = map length partitioned
+                   leaders = map head partitioned
+                in zip lengths leaders
+-- "Use group, Luke"
+
+encode xs = map (\x -> (length x,head x)) (group xs)
+{-
+ -
+ -which can also be expressed as a list comprehension:
+ -
+ -[(length x, head x) | x <- group xs]
+ -
+ -Or writing it Pointfree (Note that the type signature is essential here to avoid hitting the Monomorphism Restriction):
+ -
+ -encode :: Eq a => [a] -> [(Int, a)]
+ -encode = map (\x -> (length x, head x)) . group
+ -
+ -Or (ab)using the "&&&" arrow operator for tuples:
+ -
+ -encode :: Eq a => [a] -> [(Int, a)]
+ -encode xs = map (length &&& head) $ group xs
+ -
+ -Or using the slightly more verbose (w.r.t.
+ -(&&&)
+ -) Applicative combinators:
+ -
+ -encode :: Eq a => [a] -> [(Int, a)]
+ -encode = map ((,) <$> length <*> head) . pack
+ -
+ -Or with the help of foldr (pack is the resulting function from P09):
+ -
+ -encode xs = (enc . pack) xs
+ -    where enc = foldr (\x acc -> (length x, head x) : acc) []
+ -
+ -Or using takeWhile and dropWhile:
+ -
+ -encode [] = []
+ -encode (x:xs) = (length $ x : takeWhile (==x) xs, x)
+ -                 : encode (dropWhile (==x) xs)
+ -
+ -Or without higher order functions:
+ -
+ -encode []     = []
+ -encode (x:xs) = encode' 1 x xs where
+ -    encode' n x [] = [(n, x)]
+ -    encode' n x (y:ys)
+ -        | x == y    = encode' (n + 1) x ys
+ -        | otherwise = (n, x) : encode' 1 y ys
+ -
+ -Or we can make use of zip and group:
+ -
+ - 
+ -import List
+ -encode :: Eq a => [a] -> [(Int, a)]
+ -encode xs=zip (map length l) h where 
+ -    l = (group xs)
+ -    h = map head l
+ -}
