@@ -205,7 +205,7 @@ slice' xs i j = drop (i - 1) $ take j xs
  --
  --*Main> rotate ['a','b','c','d','e','f','g','h'] 3
  --"defghabc"
- -- 
+ --
  --*Main> rotate ['a','b','c','d','e','f','g','h'] (-2)
  --"ghabcdef"
 -}
@@ -214,3 +214,21 @@ rotate [] _ = []
 rotate xs 0 = xs    -- optimization
 rotate xs n = reverse $ reverse l ++ reverse r
                 where (l,r) = splitAt (n `mod` length xs) xs
+
+{-
+ --Problem 20
+ --
+ --(*) Remove the K'th element from a list.
+ --
+ --Example in Haskell:
+ --
+ --*Main> removeAt 2 "abcd"
+ --('b',"acd")
+-}
+
+removeAt :: Int -> [a] -> [a]
+removeAt _ [] = []
+removeAt n xs | n <= 0 = xs
+              | n >= length xs = xs
+removeAt 1 (_:xs) = xs
+removeAt n (x:xs) = x: removeAt (n - 1) xs
