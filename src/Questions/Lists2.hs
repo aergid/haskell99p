@@ -185,3 +185,32 @@ slice xs from to = [s | (s,i) <- zip xs [1..to], i >= from]
 
 slice' :: [a] -> Int -> Int -> [a]
 slice' xs i j = drop (i - 1) $ take j xs
+
+{-
+ -- Problem 19
+ --
+ --(**) Rotate a list N places to the left.
+ --
+ --Hint: Use the predefined functions length and (++).
+ --
+ --Examples:
+ --
+ --* (rotate '(a b c d e f g h) 3)
+ --(D E F G H A B C)
+ --
+ --* (rotate '(a b c d e f g h) -2)
+ --(G H A B C D E F)
+ --
+ --Examples in Haskell:
+ --
+ --*Main> rotate ['a','b','c','d','e','f','g','h'] 3
+ --"defghabc"
+ -- 
+ --*Main> rotate ['a','b','c','d','e','f','g','h'] (-2)
+ --"ghabcdef"
+-}
+rotate :: [a] -> Int -> [a]
+rotate [] _ = []
+rotate xs 0 = xs    -- optimization
+rotate xs n = reverse $ reverse l ++ reverse r
+                where (l,r) = splitAt (n `mod` length xs) xs
