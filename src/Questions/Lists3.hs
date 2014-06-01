@@ -1,5 +1,8 @@
 module Questions.Lists2 where
 
+import           Control.Applicative
+import           Control.Monad       (liftM)
+import           System.Random
 {--
  --P21> insertAt 'X' "abcd" 2
  --"aXbcd"
@@ -27,3 +30,21 @@ myRange a b = [a..b]
 
 myRange' :: (Integral a) => a -> a -> [a]
 myRange' = enumFromTo
+
+{-
+ --Problem 23
+ --
+ --Extract a given number of randomly selected elements from a list.
+ --
+ --Example in Haskell:
+ --
+ --Prelude System.Random>rndSelect "abcdefgh" 3 >>= putStrLn
+ --eda
+-}
+
+rndSelect :: [a] -> Int -> IO [a]
+--rndSelect xs n = getStdGen >>= return . take n . pickFromList xs
+rndSelect xs n = liftM (take n . pickFromList xs) getStdGen
+
+pickFromList :: (RandomGen g) => [a] -> g -> [a]
+pickFromList xs g = (xs !!) <$> randomRs (0, length xs -1) g
