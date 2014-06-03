@@ -64,3 +64,23 @@ pickFromList xs g = (xs !!) <$> randomRs (0, length xs -1) g
 
 diffSelect :: Int -> Int -> IO [Int]
 diffSelect n m = take n . nub . randomRs (1, m) <$> getStdGen
+
+{-
+ --Problem 25
+ --
+ --Generate a random permutation of the elements of a list.
+ --
+ --Example in Haskell:
+ --
+ --Prelude System.Random>rnd_permu "abcdef"
+ --Prelude System.Random>"badcef"
+-}
+
+rndPerm xs = diffSelect len len >>= \ind -> return $ (xs !!) . pred <$> ind
+                where len = length xs
+
+rndPerm' xs = liftM (\ind -> (xs !!) . pred <$> ind) $ diffSelect len len
+                where len = length xs
+
+--as usual overkilled
+rndPerm'' xs = rndSelect xs $ length xs
