@@ -84,3 +84,24 @@ rndPerm' xs = liftM (\ind -> (xs !!) . pred <$> ind) $ diffSelect len len
 
 --as usual overkilled
 rndPerm'' xs = rndSelect xs $ length xs
+
+
+{-
+ -- Problem 26 Combinations
+ --
+ --(**) Generate the combinations of K distinct objects chosen from the N elements of a list
+ --
+ --In how many ways can a committee of 3 be chosen from a group of 12 people? We all know that there are C(12,3) = 220 possibilities (C(N,K) denotes the well-known binomial coefficients). For pure mathematicians, this result may be great. But we want to really generate all the possibilities in a list.
+ --
+ --Example in Haskell:
+ --
+ --combinations 3 "abcdef"
+ --["abc","abd","abe",...]
+-}
+
+combinations :: [a] -> Int -> [[a]]
+combinations _ 0 = [[]]
+combinations xs n | n > length xs = []
+                  | n == length xs = [xs]
+combinations (x:xs) n = combinationsWith x xs (n-1) ++ combinations xs n
+                where combinationsWith x xs = map (x:) . combinations xs
