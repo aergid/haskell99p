@@ -2,7 +2,8 @@ module Questions.Lists2 where
 
 import           Control.Applicative
 import           Control.Monad       (liftM)
-import           Data.List           (nub, (\\))
+import           Data.Function
+import           Data.List           (nub, sortBy, (\\))
 import           System.Random
 {--
  --P21> insertAt 'X' "abcd" 2
@@ -141,7 +142,7 @@ groups' (a:b:c:[]) xs = do
                         g3 <- combinations ((xs \\ g1) \\ g2) c
                         return [g1, g2, g3]
 
-{- 
+{-
  --Generalized version for any multinomal length
  -- How to do it with Do?
  -combination :: Int -> [a] -> [([a],[a])]
@@ -151,10 +152,31 @@ groups' (a:b:c:[]) xs = do
  -  where
  -    ts = [ (x:ys,zs) | (ys,zs) <- combination (n-1) xs ]
  -    ds = [ (ys,x:zs) | (ys,zs) <- combination  n    xs ]
- - 
+ -
  -group :: [Int] -> [a] -> [[[a]]]
  -group [] _ = [[]]
  -group (n:ns) xs =
  -    [ g:gs | (g,rs) <- combination n xs
  -           ,  gs    <- group ns rs ]
  -}
+
+{-
+ --Problem 28
+ --
+ --Sorting a list of lists according to length of sublists
+ --
+ --a) We suppose that a list contains elements that are lists themselves. The objective is to sort the elements of this list according to their length. E.g. short lists first, longer lists later, or vice versa.
+ --
+ --Example in Haskell:
+ --
+ --Prelude>lsort ["abc","de","fgh","de","ijkl","mn","o"]
+ --Prelude>["o","de","de","mn","abc","fgh","ijkl"]
+ --
+ --b) Again, we suppose that a list contains elements that are lists themselves. But this time the objective is to sort the elements of this list according to their length frequency; i.e., in the default, where sorting is done ascendingly, lists with rare lengths are placed first, others with a more frequent length come later.
+ --
+ --Example in Haskell:
+ --
+ --lfsort ["abc", "de", "fgh", "de", "ijkl", "mn", "o"]
+ --["ijkl","o","abc","fgh","de","de","mn"]
+-}
+lsort = sortBy (compare `on` length)
