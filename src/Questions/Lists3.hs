@@ -3,7 +3,7 @@ module Questions.Lists2 where
 import           Control.Applicative
 import           Control.Monad       (liftM)
 import           Data.Function
-import           Data.List           (nub, sortBy, (\\))
+import           Data.List           (nub, sortBy, (\\), groupBy)
 import           System.Random
 {--
  --P21> insertAt 'X' "abcd" 2
@@ -180,3 +180,6 @@ groups' (a:b:c:[]) xs = do
  --["ijkl","o","abc","fgh","de","de","mn"]
 -}
 lsort = sortBy (compare `on` length)
+
+lfsort :: [[a]] -> [[a]]
+lfsort = concat . lsort . groupBy ((==) `on` length) . lsort
