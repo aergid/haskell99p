@@ -10,12 +10,18 @@ module Questions.Arithmetic where
  --P31> isPrime 7
  --True
 -}
+--first version
+--primes :: [Integer]
+--primes = map head $ iterate sieve [2..]
+
+--sieve :: [Integer] -> [Integer]
+--sieve (x:xs) = filter ((/=0) . (`mod` x)) xs
 
 primes :: [Integer]
-primes = map head $ iterate sieve [2..]
+primes = sieve [2..]
 
 sieve :: [Integer] -> [Integer]
-sieve (x:xs) = filter ((/=0) . (`mod` x)) xs
+sieve (x:xs) = x: sieve (filter ((/=0) . (`mod` x)) xs)
 
 isPrime :: Integer -> Bool
 isPrime x = all ((/=0) . (x `mod`)) $ takeWhile (<= candidateRoot) primes
